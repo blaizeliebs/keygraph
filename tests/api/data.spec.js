@@ -13,7 +13,7 @@ describe('API Data Schema', () => {
 
   it('Should have an hello field of type String', () => {
     expect(dataType.getFields()).to.have.property('hello');
-    expect(dataType.getFields().hello.type).to.deep.equals(new graphql.GraphQLNonNull(graphql.GraphQLString));
+    expect(dataType.getFields().hello.type).to.deep.equals(graphql.GraphQLString);
   });
 
 });
@@ -27,8 +27,8 @@ describe('API Data Query', () => {
   });
   const query = `
     query TestData {
-      data(userToken: "ABCDEF") {
-        hello
+      data {
+        hello(name: "ABCDEF")
       }
     }
   `;
