@@ -1,0 +1,13 @@
+{{#if data.hasSection}}
+  <h1>{{ data.section.title }}</h1>
+  <p>{{ data.section.content }}</p>
+  <img src="https://res.cloudinary.com/{{data.cloudinaryName}}/image/upload/w_640/v{{data.section.coverImage.version}}/{{data.section.coverImage.public_id}}.{{data.section.coverImage.format}}" />
+{{else if data.hasArticle}}
+  <h1>{{ data.article.title }}</h1>
+  <p>{{ data.article.content }}</p>
+  <img src="https://res.cloudinary.com/{{data.cloudinaryName}}/image/upload/w_640/v{{data.article.coverImage.version}}/{{data.article.coverImage.public_id}}.{{data.article.coverImage.format}}" />
+{{else if data.hasCategory}}
+  <h1>{{ data.category.title }}</h1>
+  <p>{{ data.category.description }}</p>
+  <img src="https://res.cloudinary.com/{{data.cloudinaryName}}/image/upload/w_640/v{{data.category.wheelImage.version}}/{{data.category.wheelImage.public_id}}.{{data.category.wheelImage.format}}" />
+{{/if}}

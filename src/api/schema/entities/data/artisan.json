@@ -1,0 +1,17 @@
+{
+  "entity": {
+    "LCSingular": "data",
+    "UCSingular": "DATA",
+    "UCFCCSingular": "Data",
+    "LCFCCSingular": "data",
+    "LCPlural": "data",
+    "UCPlural": "DATA",
+    "UCFCCPlural": "Data",
+    "LCFCCPlural": "data"
+  },
+  "interfaceName": null,
+  "hasList": false,
+  "hasSubscription": false,
+  "hasDatasource": false,
+  "isInterface": false
+}
