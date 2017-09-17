@@ -102,7 +102,8 @@ class ObjectBuilder extends Builder {
       })
       for (let s = 0; s < subTypes.length; s++) {
         code.addLine(`if (data.${entity.LCFCCSingular}Type === '${subTypes[s].entity.LCFCCSingular}') {`)
-        code.addInsetLine(`return '${subTypes[s].entity.UCFCCSingular}'`)
+        code.addInsetLine(`let ${subTypes[s].entity.UCFCCSingular} = require('../${subTypes[s].entity.LCSingular}/data')`)
+        code.addLine(`return new ${subTypes[s].entity.UCFCCSingular}(data)`)
         code.addOutsetLine(`}`)
       }
       code.addLine(`return null`)
@@ -139,6 +140,14 @@ class ObjectBuilder extends Builder {
     }
 
     let fieldDeclerations = []
+
+    if (interfaceName) {
+      fieldDeclerations.push({
+        dec: `${entity.LCFCCPlural}Type = null`,
+        inc: `${entity.LCFCCPlural}Type`,
+        ass: `this.${entity.LCFCCPlural}Type = ${entity.LCFCCPlural}Type`,
+      })
+    }
 
     _.each(lists, (listItem) => {
       let listEntity = this.getEntityData(listItem)
