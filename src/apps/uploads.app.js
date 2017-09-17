@@ -1,5 +1,5 @@
-import path from 'path'
-import express from 'express'
+let path = require('path')
+let express = require('express')
 let uploadsApp = express.static(path.join(__dirname, '../../', 'uploads'))
 
-export default uploadsApp
+module.exports = uploadsApp

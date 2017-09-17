@@ -1,11 +1,11 @@
-import program from 'commander'
-import chalk from 'chalk'
-import fs from 'fs'
-import path from 'path'
-import Promise from 'bluebird'
-import * as _ from 'underscore'
-import sh from 'shelljs'
-import {
+let program = require('commander')
+let chalk = require('chalk')
+let fs = require('fs')
+let path = require('path')
+let Promise = require('bluebird')
+let _ = require('underscore')
+let sh = require('shelljs')
+let {
   isLeafType,
   isOutputType,
   isAbstractType,
@@ -16,19 +16,19 @@ import {
   GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLList,
-} from 'graphql'
-import CodeGen from './codegen'
+} = require('graphql')
+let CodeGen = require('./codegen')
 
-import schema from '../src/api/schema/'
-import SchemaBuilder from './schemabuilder'
-import ObjectBuilder from './objectbuilder'
-import DataBuilder from './databuilder'
-import KeystoneDataBuilder from './keystonedatabuilder'
-import ListBuilder from './listbuilder'
-import MutationBuilder from './mutationbuilder'
-import IndexBuilder from './indexbuilder'
-import KeystoneModelBuilder from './keystonemodelbuilder'
-import KeystoneValidatorBuilder from './keystonevalidatorbuilder'
+let schema = require('../src/api/schema/').schema
+let SchemaBuilder = require('./schemabuilder')
+let ObjectBuilder = require('./objectbuilder')
+let ModelBuilder = require('./modelbuilder')
+let KeystoneModelBuilder = require('./keystonemodelbuilder')
+let ListBuilder = require('./listbuilder')
+let MutationBuilder = require('./mutationbuilder')
+let IndexBuilder = require('./indexbuilder')
+let KeystoneObjectBuilder = require('./keystoneobjectbuilder')
+let KeystoneValidatorBuilder = require('./keystonevalidatorbuilder')
 
 class Artisan {
 
@@ -86,7 +86,7 @@ class Artisan {
     this.setEntityData(singular, itemData)
     this.buildSchemaFile(entity.UCFCCSingular)
     this.buildObjectFile(entity.UCFCCSingular)
-    this.buildDataFile(entity.UCFCCSingular)
+    this.buildModelFile(entity.UCFCCSingular)
     if (hasMutations && !isInterface) {
       this.buildMutationFile(entity.UCFCCSingular)
     } else {
@@ -105,9 +105,9 @@ class Artisan {
 
   }
 
-  removeDataFile(name) {
+  removeModelFile(name) {
     let schemaDir = this.getEntitySchemaDirectory(name)
-    let file = `${schemaDir}data.js`
+    let file = `${schemaDir}model.js`
     if (fs.existsSync(file)) {
       fs.unlinkSync(file)
     }
@@ -153,16 +153,16 @@ class Artisan {
     fs.writeFileSync(`${schemaDir}object.js`, entityCode)
   }
 
-  buildDataFile(name) {
+  buildModelFile(name) {
     console.log(chalk.red.bold(`CREATING DATA OBJECT..............  [${chalk.white(name)}]`))
     let entityData = this.getEntityData(name)
-    let dataBuilder = new KeystoneDataBuilder(schema, entityData)
-    let entityCode = dataBuilder.build()
+    let modelBuilder = new KeystoneModelBuilder(schema, entityData)
+    let entityCode = modelBuilder.build()
     let schemaDir = this.getEntitySchemaDirectory(name)
     if (!fs.existsSync(schemaDir)) {
       fs.mkdirSync(schemaDir)
     }
-    fs.writeFileSync(`${schemaDir}data.js`, entityCode)
+    fs.writeFileSync(`${schemaDir}model.js`, entityCode)
   }
 
   buildListFile(name) {
@@ -209,7 +209,7 @@ class Artisan {
     let mutationFunctions = []
     _.each(items, (item) => {
       if (fs.lstatSync(`${entitiesDir}${item}`).isDirectory()) {
-        if (item == 'data') {
+        if (item === 'data') {
           exportItems.push({
             name: `dataSchema`,
             from: `./data/`,
@@ -223,7 +223,7 @@ class Artisan {
           if (isInterface) {
             resolverFnctions.push({
               item: entity.UCFCCSingular,
-              from: `./${entity.LCSingular}/data`,
+              from: `./${entity.LCSingular}/object`,
             })
           }
           if (hasMutations && !isInterface) {
@@ -286,13 +286,13 @@ class Artisan {
     let code = new CodeGen()
     code.reset()
     _.each(exportItems, (exportItem) => {
-      code.addLine(`import { ${exportItem.name} } from '${exportItem.from}'`)
+      code.addLine(`let { ${exportItem.name} } = require('${exportItem.from}')`)
     })
     _.each(resolverFnctions, (resolverItem) => {
-      code.addLine(`import ${resolverItem.item} from '${resolverItem.from}'`)
+      code.addLine(`let ${resolverItem.item} = require('${resolverItem.from}')`)
     })
     _.each(mutationFunctions, (mutationItem) => {
-      code.addLine(`import ${mutationItem.item} from '${mutationItem.from}'`)
+      code.addLine(`let ${mutationItem.item} = require('${mutationItem.from}')`)
     })
     code.addLine(``)
     code.addLine(`function getSchemaDefinitions() {`)
@@ -318,24 +318,32 @@ class Artisan {
     code.addOutsetLine(`}`)
     code.addLine(``)
     code.addLine(`function getResolverFunctions() {`)
-    code.addInsetLine('return {')
+    code.addInsetLine('return Object.assign({},')
     code.inset()
-    _.each(resolverFnctions, (resolverItem) => {
-      code.addLine(`...${resolverItem.item}.resolver(),`)
+    _.each(resolverFnctions, (resolverItem, index) => {
+      if (index !== resolverFnctions.length - 1) {
+        code.addLine(`${resolverItem.item}.resolver(),`)
+      } else {
+        code.addLine(`${resolverItem.item}.resolver()`)
+      }
     })
-    code.addOutsetLine(`}`)
+    code.addOutsetLine(`)`)
     code.addOutsetLine(`}`)
     code.addLine(``)
     code.addLine(`function getMutationFunctions() {`)
-    code.addInsetLine('return {')
+    code.addInsetLine('return Object.assign({},')
     code.inset()
-    _.each(mutationFunctions, (mutationItem) => {
-      code.addLine(`...${mutationItem.item},`)
+    _.each(mutationFunctions, (mutationItem, index) => {
+      if (index !== mutationFunctions.length - 1) {
+        code.addLine(`${mutationItem.item},`)
+      } else {
+        code.addLine(`${mutationItem.item}`)
+      }
     })
-    code.addOutsetLine(`}`)
+    code.addOutsetLine(`)`)
     code.addOutsetLine(`}`)
     code.addLine(``)
-    code.addLine(`export {`)
+    code.addLine(`module.exports = {`)
     code.addInsetLine(`getSchemaDefinitions,`)
     code.addLine(`getSchemaMutations,`)
     code.addLine(`getSchemaSubscriptions,`)
@@ -356,14 +364,18 @@ class Artisan {
       code.addOutsetLine('}')
       code.addLine(``)
     })
-    code.addLine(`let permissions = {`)
+    code.addLine(`let permissions = Object.assign({},`)
     code.inset()
-    _.each(permissionItems, (permission) => {
-      code.addLine(`...${permission.entity.LCFCCSingular}Permissions,`)
+    _.each(permissionItems, (permission, index) => {
+      if (index !== permissionItems.length - 1) {
+        code.addLine(`${permission.entity.LCFCCSingular}Permissions,`)
+      } else {
+        code.addLine(`${permission.entity.LCFCCSingular}Permissions`)
+      }
     })
-    code.addOutsetLine(`}`)
+    code.addOutsetLine(`)`)
     code.addLine(``)
-    code.addLine(`export default permissions`)
+    code.addLine(`module.exports = permissions`)
 
     entityCode = code.toString()
     fs.writeFileSync(`${permissionsDir}permissions.js`, entityCode)
@@ -378,7 +390,7 @@ class Artisan {
     _.each(types, (type, key) => {
       if (!isLeafType(type) && isOutputType(type)) {
         // console.log(key+' IS OBJECT')
-        if (key !== 'Data' && key !== 'Query' && key !== 'Mutation' && key !== 'Subscription' && key.indexOf('__') == -1 && key.indexOf('List') == -1) {
+        if (key !== 'Data' && key !== 'Query' && key !== 'Mutation' && key !== 'Subscription' && key !== 'Subscriptions' && key.indexOf('__') == -1 && key.indexOf('List') == -1) {
           returnObjects[key] = type
         }
       }
@@ -436,7 +448,7 @@ class Artisan {
     _.each(schemaObjects, (type, key) => {
       let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.getEntityData(key)
       this.buildObjectFile(entity.UCFCCSingular)
-      this.buildDataFile(entity.UCFCCSingular)
+      this.buildModelFile(entity.UCFCCSingular)
       if (hasMutations && !isInterface) {
         this.buildMutationFile(entity.UCFCCSingular)
       } else {
@@ -459,7 +471,7 @@ class Artisan {
     let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.getEntityData(name)
     this.buildObjectFile(entity.UCFCCSingular)
     if (hasDatasource) {
-      this.buildDataFile(entity.UCFCCSingular)
+      this.buildModelFile(entity.UCFCCSingular)
     }
     if (hasMutations && !isInterface) {
       this.buildMutationFile(entity.UCFCCSingular)
@@ -486,7 +498,7 @@ class Artisan {
     }
     _.each(schemaObjects, (type, key) => {
       let entityData = this.getEntityData(key)
-      let modelBuilder = new KeystoneModelBuilder(schema, entityData)
+      let modelBuilder = new KeystoneObjectBuilder(schema, entityData)
       let modelCode = modelBuilder.build()
       if (modelCode) {
         fs.writeFileSync(`${modelDirectory}/${key}.js`, modelCode)
@@ -515,7 +527,7 @@ class Artisan {
       fs.mkdirSync(validatorDirectory)
     }
     let entityData = this.getEntityData(name)
-    let modelBuilder = new KeystoneModelBuilder(schema, entityData)
+    let modelBuilder = new KeystoneObjectBuilder(schema, entityData)
     let modelCode = modelBuilder.build()
     if (modelCode) {
       fs.writeFileSync(`${modelDirectory}/${entityData.entity.UCFCCSingular}.js`, modelCode)
@@ -558,4 +570,4 @@ class Artisan {
 
 }
 
-export default Artisan
+module.exports = Artisan

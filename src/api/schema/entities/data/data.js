@@ -1,5 +1,5 @@
-import DataQL from './object'
+let DataQL = require('./object')
 
 class Data extends DataQL {}
 
-export default Data
+module.exports = Data

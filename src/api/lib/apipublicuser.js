@@ -1,11 +1,9 @@
-import Promise from 'bluebird'
-import APIUser from './apiuser'
-import * as _ from 'underscore'
-import permissions from '../schema/supporting/permissions'
+let Promise = require('bluebird')
+let APIUser = require('./apiuser')
+let _ = require('underscore')
+let permissions = require('../schema/supporting/permissions')
 
 class APIPublicUser extends APIUser {
-
-  permissions = []
 
   loadPermissions(token) {
     return new Promise((resolve, reject) => {
@@ -22,4 +20,4 @@ class APIPublicUser extends APIUser {
 
 }
 
-export default APIPublicUser
+module.exports = APIPublicUser

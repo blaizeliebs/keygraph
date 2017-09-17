@@ -1,9 +1,9 @@
-import * as _ from 'underscore'
-import {
+let _ = require('underscore')
+let {
   isAbstractType,
-} from 'graphql'
-import Builder from './builder'
-import CodeGen from './codegen'
+} = require('graphql')
+let Builder = require('./builder')
+let CodeGen = require('./codegen')
 
 class ListBuilder extends Builder {
 
@@ -16,7 +16,7 @@ class ListBuilder extends Builder {
     let code = new CodeGen()
     code.reset()
     code.addBlock(`
-      import ${entity.UCFCCSingular} from './data'
+      let ${entity.UCFCCSingular} = require('./data')
 
       let ${entity.UCFCCSingular}ListMixin = (superclass, filterName = false) => class extends superclass {
 
@@ -52,7 +52,7 @@ class ListBuilder extends Builder {
         }
       }
 
-      export default ${entity.UCFCCSingular}ListMixin
+      module.exports = ${entity.UCFCCSingular}ListMixin
     `)
 
     return code.toString()
@@ -60,4 +60,4 @@ class ListBuilder extends Builder {
 
 }
 
-export default ListBuilder
+module.exports = ListBuilder

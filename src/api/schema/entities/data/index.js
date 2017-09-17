@@ -1,7 +1,7 @@
-import Data from './data'
-import dataSchema from './schema'
+let Data = require('./data')
+let dataSchema = require('./schema')
 
-export {
-  Data as default,
+module.exports = {
+  Data,
   dataSchema,
 }

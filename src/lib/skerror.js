@@ -1,8 +1,6 @@
-import ExtendableError from './extendableerror'
+let ExtendableError = require('./extendableerror')
 
 class SkError extends ExtendableError {
-
-  httpCode = 0;
 
   constructor(m, code = 500) {
     super(m)
@@ -11,4 +9,4 @@ class SkError extends ExtendableError {
 
 }
 
-export default SkError
+module.exports = SkError

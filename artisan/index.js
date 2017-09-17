@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import program from 'commander'
-import Artisan from './artisan'
+let program = require('commander')
+let Artisan = require('./artisan')
 
 let artisan = new Artisan()
 

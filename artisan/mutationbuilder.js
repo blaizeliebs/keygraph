@@ -1,9 +1,9 @@
-import * as _ from 'underscore'
-import {
+let _ = require('underscore')
+let {
   isAbstractType,
-} from 'graphql'
-import Builder from './builder'
-import CodeGen from './codegen'
+} = require('graphql')
+let Builder = require('./builder')
+let CodeGen = require('./codegen')
 
 class MutationBuilder extends Builder {
 
@@ -15,26 +15,26 @@ class MutationBuilder extends Builder {
     let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.entityData
     let code = new CodeGen()
     code.reset()
-    code.addLine(`import ${entity.UCFCCSingular} from './data'`)
-    code.addLine(`import APIPublicUser from '../../../lib/apipublicuser'`)
+    code.addLine(`let ${entity.UCFCCSingular}Model = require('./model')`)
+    code.addLine(`let APIPublicUser = require('../../../lib/apipublicuser')`)
     code.openClass(`${entity.UCFCCSingular}Mutations`)
     code.openFunction(`add`, `args, ctx`)
     if (hasDatasource) {
-      code.addLine(`return ${entity.UCFCCSingular}.add(args, ctx)`)
+      code.addLine(`return ${entity.UCFCCSingular}Model.add(args, ctx)`)
     } else {
       code.addLine(`throw new Error(JSON.stringify({ message: '${entity.UCFCCSingular} mutations not implemented', code: 500 }))`)
     }
     code.closeFunction()
     code.openFunction(`update`, `args, ctx`)
     if (hasDatasource) {
-      code.addLine(`return ${entity.UCFCCSingular}.update(args, ctx)`)
+      code.addLine(`return ${entity.UCFCCSingular}Model.update(args, ctx)`)
     } else {
       code.addLine(`throw new Error(JSON.stringify({ message: '${entity.UCFCCSingular} mutations not implemented', code: 500 }))`)
     }
     code.closeFunction()
     code.openFunction(`remove`, `args, ctx`)
     if (hasDatasource) {
-      code.addLine(`return ${entity.UCFCCSingular}.remove(args, ctx)`)
+      code.addLine(`return ${entity.UCFCCSingular}Model.remove(args, ctx)`)
     } else {
       code.addLine(`throw new Error(JSON.stringify({ message: '${entity.UCFCCSingular} mutations not implemented', code: 500 }))`)
     }
@@ -49,7 +49,7 @@ class MutationBuilder extends Builder {
         remove${entity.UCFCCSingular}:(obj, args, ctx, info) => ${entity.LCFCCSingular}MutationsObject.remove(args, ctx)
       }
 
-      export default ${entity.LCFCCSingular}Mutations
+      module.exports = ${entity.LCFCCSingular}Mutations
     `)
 
     return code.toString()
@@ -57,4 +57,4 @@ class MutationBuilder extends Builder {
 
 }
 
-export default MutationBuilder
+module.exports = MutationBuilder

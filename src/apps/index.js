@@ -1,15 +1,13 @@
-import apiApp from './api.app'
-import graphiqlApp from './graphiql.app'
-import siteApp from './site.app'
-import corsApp from './cors.app'
-import uploadsApp from './uploads.app'
-import authApp from './auth.app'
+let apiApp = require('./api.app')
+let graphiqlApp = require('./graphiql.app')
+let corsApp = require('./cors.app')
+let authApp = require('./auth.app')
+let publicApp = require('./public.app')
 
-export {
+module.exports = {
   apiApp,
   graphiqlApp,
-  siteApp,
   corsApp,
-  uploadsApp,
   authApp,
+  publicApp,
 }

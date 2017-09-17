@@ -1,7 +1,7 @@
-import jwt from 'json-web-token'
-import Promise from 'bluebird'
-import SkError from './skerror'
-import bcrypt from 'bcryptjs'
+let jwt = require('json-web-token')
+let Promise = require('bluebird')
+let SkError = require('./skerror')
+let bcrypt = require('bcryptjs')
 
 class JWTAuthError extends SkError {}
 
@@ -119,4 +119,4 @@ class JWTAuth {
 
 }
 
-export { JWTAuth as default, JWTAuthError }
+module.exports = { JWTAuth, JWTAuthError }

@@ -1,6 +1,6 @@
-import express from 'express'
-import bodyParser from 'body-parser'
-import JWTAuth from '../lib/jwtauth'
+let express = require('express')
+let bodyParser = require('body-parser')
+let { JWTAuth } = require('../lib/jwtauth')
 
 let jwt = new JWTAuth()
 
@@ -38,4 +38,4 @@ authApp.get('/validate/:token', (request, response, next) => {
   })
 })
 
-export default authApp
+module.exports = authApp

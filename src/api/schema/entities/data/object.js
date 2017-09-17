@@ -1,12 +1,11 @@
-import APIData from '../apidata'
+let _ = require('underscore')
+let APIObject = require('../../../lib/apiobject')
 
-class DataQL extends APIData {
+class Data extends APIObject {
 
   static create(data) {
-    return new DataQL(data)
+    return new Data(data)
   }
-
-  _hello = null;
 
   constructor(data) {
     super(data)
@@ -15,10 +14,10 @@ class DataQL extends APIData {
     this._hello = hello
   }
 
-  hello({ name }) {
-    return `Hello ${name}!`
+  hello({ name }, ctx, info) {
+    return this._hello
   }
 
 }
 
-export default DataQL
+module.exports = Data

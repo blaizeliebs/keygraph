@@ -1,13 +1,13 @@
-import * as _ from 'underscore'
-import {
+let _ = require('underscore')
+let {
   isAbstractType,
   getNullableType,
   GraphQLList,
   getNamedType,
   GraphQLEnumType,
-} from 'graphql'
-import Builder from './builder'
-import CodeGen from './codegen'
+} = require('graphql')
+let Builder = require('./builder')
+let CodeGen = require('./codegen')
 
 class ObjectBuilder extends Builder {
 
@@ -33,13 +33,13 @@ class ObjectBuilder extends Builder {
     _.each(fields, (field) => {
       if (field.definition === 'Relation' || field.definition === 'Embedded') {
         let entityData = this.getEntityData(field.type).entity
-        addToImportList(`${entityData.UCFCCSingular}`, `'../${entityData.LCSingular}/data'`)
+        addToImportList(`${entityData.UCFCCSingular}`, `'../${entityData.LCSingular}/model'`)
       }
     })
     let lists = this.getSchemaLists(name)
     _.each(lists, (list) => {
       let entityData = this.getEntityData(list).entity
-      addToImportList(`${entityData.UCFCCSingular}`, `'../${entityData.LCSingular}/data'`)
+      addToImportList(`${entityData.UCFCCSingular}`, `'../${entityData.LCSingular}/model'`)
     })
 
     return importList
@@ -50,29 +50,35 @@ class ObjectBuilder extends Builder {
     let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.entityData
     let code = new CodeGen()
     code.reset()
-    code.addLine(`import * as _ from 'underscore'`)
+    code.addLine(`let _ = require('underscore')`)
     let interfaceData = false
     if (interfaceName) {
       interfaceData = this.getEntityData(interfaceName)
-      code.addLine(`import ${interfaceData.entity.UCFCCSingular}QL from '../${interfaceData.entity.LCSingular}/object'`)
-    } else if (hasDatasource) {
-      code.addLine(`import APIParent from '../apiparent'`)
-    } else {
-      code.addLine(`import APIData from '../apidata'`)
+      code.addLine(`let ${interfaceData.entity.UCFCCSingular} = require('../${interfaceData.entity.LCSingular}/object')`)
+      // process.exit()
     }
+    if (isInterface) {
+      let definedObjects = this.getDefinedSchemaObjects()
+      _.each(definedObjects, (type, key) => {
+        if (!isAbstractType(type)) {
+          if (_.contains(_.map(type.getInterfaces(), 'name'), entity.UCFCCSingular)) {
+            let subType = this.getEntityData(key)
+            code.addLine(`let ${subType.entity.UCFCCSingular} = require('../${subType.entity.LCSingular}/object')`)
+          }
+        }
+      })
+    }
+    code.addLine(`let APIObject = require('../../../lib/apiobject')`)
 
     let imports = this.getObjectSchemaImports(entity.UCFCCSingular)
     let fields = this.getSchemaFields(entity.UCFCCSingular)
     let lists = this.getSchemaLists(entity.UCFCCSingular)
 
     _.each(imports, (importItem) => {
-      code.addLine(`import ${importItem.item} from ${importItem.from}`)
+      code.addLine(`let ${importItem.item} = require(${importItem.from})`)
     })
 
-    let extensionName = `APIData`
-    if (hasDatasource) {
-      extensionName = `APIParent`
-    }
+    let extensionName = `APIObject`
     if (false) { // lists.length) {
       let mixinClass = extensionName
       if (interfaceName) {
@@ -84,9 +90,9 @@ class ObjectBuilder extends Builder {
       })
       extensionName = mixinClass
     } else if (interfaceName) {
-      extensionName = `${interfaceData.entity.UCFCCSingular}QL`
+      extensionName = `${interfaceData.entity.UCFCCSingular}`
     }
-    code.openClass(`${entity.UCFCCSingular}QL`, extensionName)
+    code.openClass(`${entity.UCFCCSingular}`, extensionName)
     // TODO: connect interface children
     // TODO: Add interface resolvers
     code.openFunction(`static create`, `data`)
@@ -102,13 +108,13 @@ class ObjectBuilder extends Builder {
       })
       for (let s = 0; s < subTypes.length; s++) {
         code.addLine(`if (data.${entity.LCFCCSingular}Type === '${subTypes[s].entity.LCFCCSingular}') {`)
-        code.addInsetLine(`let ${subTypes[s].entity.UCFCCSingular} = require('../${subTypes[s].entity.LCSingular}/data')`)
-        code.addLine(`return new ${subTypes[s].entity.UCFCCSingular}(data)`)
+        // code.addInsetLine(`let ${subTypes[s].entity.UCFCCSingular} = require('../${subTypes[s].entity.LCSingular}/data')`)
+        code.addInsetLine(`return new ${subTypes[s].entity.UCFCCSingular}(data)`)
         code.addOutsetLine(`}`)
       }
       code.addLine(`return null`)
     } else {
-      code.addLine(`return new ${entity.UCFCCSingular}QL(data)`)
+      code.addLine(`return new ${entity.UCFCCSingular}(data)`)
     }
     code.closeFunction()
 
@@ -128,7 +134,7 @@ class ObjectBuilder extends Builder {
       code.addInsetLine(`__resolveType(obj, ctx, info) {`)
       code.inset()
       for (let s = 0; s < subTypes.length; s++) {
-        code.addLine(`if (data.${entity.LCFCCSingular}Type === '${subTypes[s].entity.LCFCCSingular}') {`)
+        code.addLine(`if (obj.${entity.LCFCCSingular}Type === '${subTypes[s].entity.LCFCCSingular}') {`)
         code.addInsetLine(`return '${subTypes[s].entity.UCFCCSingular}'`)
         code.addOutsetLine(`}`)
       }
@@ -143,9 +149,9 @@ class ObjectBuilder extends Builder {
 
     if (interfaceName) {
       fieldDeclerations.push({
-        dec: `${entity.LCFCCPlural}Type = null`,
-        inc: `${entity.LCFCCPlural}Type`,
-        ass: `this.${entity.LCFCCPlural}Type = ${entity.LCFCCPlural}Type`,
+        dec: `${interfaceData.entity.LCFCCPlural}Type = null`,
+        inc: `${interfaceData.entity.LCFCCPlural}Type`,
+        ass: `this.${interfaceData.entity.LCFCCPlural}Type = ${interfaceData.entity.LCFCCPlural}Type`,
       })
     }
 
@@ -221,9 +227,9 @@ class ObjectBuilder extends Builder {
       }
     }
 
-    _.each(fieldDeclerations, (field) => {
-      code.addLine(field.dec)
-    })
+    // _.each(fieldDeclerations, (field) => {
+    //   code.addLine(field.dec)
+    // })
 
     code.addLine(``)
     code.openFunction('constructor', 'data')
@@ -352,7 +358,7 @@ class ObjectBuilder extends Builder {
     code.addLine(``)
 
     code.closeClass()
-    code.addExport(`${entity.UCFCCSingular}QL`)
+    code.addExport(`${entity.UCFCCSingular}`)
     // console.log(code.toString())
     // process.exit()
     return code.toString()
@@ -360,4 +366,4 @@ class ObjectBuilder extends Builder {
 
 }
 
-export default ObjectBuilder
+module.exports = ObjectBuilder

@@ -1,9 +1,9 @@
-import * as _ from 'underscore'
-import {
+let _ = require('underscore')
+let {
   isAbstractType,
-} from 'graphql'
-import Builder from './builder'
-import CodeGen from './codegen'
+} = require('graphql')
+let Builder = require('./builder')
+let CodeGen = require('./codegen')
 
 class KeystoneValidatorBuilder extends Builder {
 
@@ -35,4 +35,4 @@ class KeystoneValidatorBuilder extends Builder {
 
 }
 
-export default KeystoneValidatorBuilder
+module.exports = KeystoneValidatorBuilder

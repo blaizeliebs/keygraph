@@ -17,7 +17,7 @@ const schemaDefinition = `
 const listDefinition = ``
 
 const mutationDefinitions = `
-  mutateStuff(in:String): String
+  placeholderMutation(in:String): String
 `
 
 const subscriptionDefinitions = `
@@ -31,4 +31,4 @@ const dataSchema = {
   getSubscriptionDefinitions: () => subscriptionDefinitions
 }
 
-export default dataSchema
+module.exports = dataSchema

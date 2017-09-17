@@ -1,6 +1,6 @@
-import { GraphQLScalarType } from 'graphql'
-import { Kind } from 'graphql/language'
-import { GraphQLError } from 'graphql/error'
+let { GraphQLScalarType } = require('graphql')
+let { Kind } = require('graphql/language')
+let { GraphQLError } = require('graphql/error')
 
 let TokenQL = new GraphQLScalarType({
   name: 'Token',
@@ -24,4 +24,4 @@ let TokenQL = new GraphQLScalarType({
   },
 })
 
-export default TokenQL
+module.exports = TokenQL

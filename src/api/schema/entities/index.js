@@ -1,32 +1,32 @@
-import dataSchema from './data/schema'
+let { dataSchema } = require('./data/')
 
 function getSchemaDefinitions() {
   return `
     ${dataSchema.getSchemaDefinitions()}
   `
-};
+}
 
 function getSchemaMutations() {
   return `
     ${dataSchema.getMutationDefinitions()}
   `
-};
+}
 
 function getSchemaSubscriptions() {
-  return `
-    ${dataSchema.getSubscriptionDefinitions()}
-  `
-};
+  return ``
+}
 
 function getResolverFunctions() {
-  return {}
+  return Object.assign({},
+  )
 }
 
 function getMutationFunctions() {
-  return {}
+  return Object.assign({},
+  )
 }
 
-export {
+module.exports = {
   getSchemaDefinitions,
   getSchemaMutations,
   getSchemaSubscriptions,

@@ -1,5 +1,5 @@
-import { MongoClient, ObjectId } from 'mongodb'
-import Promise from 'bluebird'
+let { MongoClient, ObjectId } = require('mongodb')
+let Promise = require('bluebird')
 
 const connectionString = `mongodb://${process.env.MONGO_SERVER}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`
 
@@ -25,4 +25,4 @@ class APIData {
 
 }
 
-export default APIData
+module.exports = APIData

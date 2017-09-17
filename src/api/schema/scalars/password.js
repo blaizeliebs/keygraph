@@ -1,6 +1,6 @@
-import { GraphQLScalarType } from 'graphql'
-import { Kind } from 'graphql/language'
-import { GraphQLError } from 'graphql/error'
+let { GraphQLScalarType } = require('graphql')
+let { Kind } = require('graphql/language')
+let { GraphQLError } = require('graphql/error')
 
 let PasswordQL = new GraphQLScalarType({
   name: 'Password',
@@ -24,4 +24,4 @@ let PasswordQL = new GraphQLScalarType({
   },
 })
 
-export default PasswordQL
+module.exports = PasswordQL

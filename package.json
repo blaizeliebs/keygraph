@@ -6,7 +6,7 @@
   "scripts": {
     "globals": "npm install -g mocha webpack",
     "test": "NODE_ENV=test mocha './tests/**/*.spec.js'",
-    "dev": "gulp watch --trace-warnings",
+    "dev": "gulp watch --trace-warnings & webpack --watch --config=./webpack.dev.config.js",
     "build": "babel src/ -d build/ -s --ignore src/site && webpack -p --env=prod --progress --profile --colors --config ./webpack.prod.config.js"
   },
   "author": "Drew Cronje",

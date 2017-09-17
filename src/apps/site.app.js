@@ -1,13 +1,13 @@
-import '../includes/env'
-import express from 'express'
-import exphbs from 'express-handlebars'
-import path from 'path'
-import chalk from 'chalk'
+require('../includes/env')
+let express = require('express')
+let exphbs = require('express-handlebars')
+let path = require('path')
+let chalk = require('chalk')
 
-import webpack from 'webpack'
-import webpackMiddleware from 'webpack-dev-middleware'
-import webpackHotMiddleware from 'webpack-hot-middleware'
-import config from '../../webpack.dev.config.js'
+let webpack = require('webpack')
+let webpackMiddleware = require('webpack-dev-middleware')
+let webpackHotMiddleware = require('webpack-hot-middleware')
+let config = require('../../webpack.dev.config.js')
 
 const isDeveloping = process.env.NODE_ENV !== 'production'
 let appDir = path.dirname(require.main.filename)
@@ -64,4 +64,4 @@ siteApp.get('/*', (req, res, next) => {
   )
 })
 console.log(`REACT APP ENDPOINT....[${chalk.blue(`INITIALISED`)}]`)
-export default siteApp
+module.exports = siteApp

@@ -1,8 +1,10 @@
-import Promise from 'bluebird'
+let Promise = require('bluebird')
 
 class APIUser {
 
-  permissions = []
+  constructor() {
+    this.permissions = []
+  }
 
   loadPermissions(info) {
     return Promise.resolve()
@@ -23,4 +25,4 @@ class APIUser {
 
 }
 
-export default APIUser
+module.exports = APIUser

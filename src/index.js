@@ -1,35 +1,21 @@
-import './includes/env'
-import express from 'express'
-import chalk from 'chalk'
-import bodyParser from 'body-parser'
-import { apiApp, graphiqlApp, corsApp, uploadsApp } from './apps/'
-import path from 'path'
-import keystone from 'keystone'
-import handlebars from 'express-handlebars'
-import Helpers from './cms/templates/views/helpers'
+require('./includes/env')
+let express = require('express')
+let chalk = require('chalk')
+let bodyParser = require('body-parser')
+let { apiApp, graphiqlApp, corsApp, publicApp } = require('./apps/')
+let path = require('path')
+let keystone = require('keystone')
+let handlebars = require('express-handlebars')
+let Helpers = require('./cms/templates/views/helpers')
 
 console.log(`\n\n ***   [${chalk.blue(`STARTING WEB SERVER`)}]   ***\n`)
 let appDir = path.dirname(require.main.filename)
 let app = express()
 
 app.use(corsApp)
-app.use(uploadsApp)
+app.use(publicApp)
 app.use('/api', bodyParser.json(), apiApp)
 app.use('/graphql', graphiqlApp)
-// app.use('/', siteApp);
-
-// let server = app.listen(process.env.PORT);
-// console.log(`OPENING PORT: ${chalk.yellow(process.env.PORT)}....[${chalk.blue(`INITIALISED`)}]`);
-
-// Simulate config options from your production environment by
-// customising the .env file in your project's root folder.
-// require('dotenv').config();
-
-// Require keystone
-
-// Initialise Keystone with your project's configuration.
-// See http://keystonejs.com/guide/config for available options
-// and documentation.
 
 let helpers = Helpers()
 keystone.init({
@@ -108,7 +94,6 @@ keystone.start({
 
 process.on('SIGINT', function () {
   console.log(`\n\n *** [${chalk.red(`SIGINT SHUTDOWN PROCESS`)}] ***\n`)
-  keystone.close()
   console.log(`HTTP SERVER.............[${chalk.red(`SHUT DOWN`)}]`)
   process.exit()
 })

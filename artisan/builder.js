@@ -1,9 +1,9 @@
-import fs from 'fs'
-import path from 'path'
-import * as _ from 'underscore'
-import sh from 'shelljs'
+let fs = require('fs')
+let path = require('path')
+let _ = require('underscore')
+let sh = require('shelljs')
 
-import {
+let {
   getNullableType,
   getNamedType,
   isInputType,
@@ -13,12 +13,9 @@ import {
   isAbstractType,
   GraphQLNonNull,
   GraphQLEnumType,
-} from 'graphql'
+} = require('graphql')
 
 class Builder {
-
-  entityData = null
-  schema = null
 
   constructor(schema, entityData) {
     this.schema = schema
@@ -329,4 +326,4 @@ class Builder {
 
 }
 
-export default Builder
+module.exports = Builder

@@ -1,15 +1,15 @@
-import * as _ from 'underscore'
-import {
+let _ = require('underscore')
+let {
   isAbstractType,
   getNullableType,
   getNamedType,
   GraphQLList,
   GraphQLID,
-} from 'graphql'
-import Builder from './builder'
-import CodeGen from './codegen'
+} = require('graphql')
+let Builder = require('./builder')
+let CodeGen = require('./codegen')
 
-class DataBuilder extends Builder {
+class ModelBuilder extends Builder {
 
   constructor(schema, entityData) {
     super(schema, entityData)
@@ -23,12 +23,12 @@ class DataBuilder extends Builder {
     code.reset()
 
     code.addBlock(`
-      import * as _ from 'underscore'
-      import Promise from 'bluebird'
-      import permissions from '../../supporting/permissions'
-      import ${entity.UCFCCSingular}QL from './object'
+      let _ = require('underscore')
+      let Promise = require('bluebird')
+      let permissions = require('../../supporting/permissions')
+      let Model = require('../../../lib/apimodel')
     `)
-    code.openClass(entity.UCFCCSingular, `${entity.UCFCCSingular}QL`)
+    code.openClass(`${entity.UCFCCSingular}Model`, `APIModel`)
     if (hasDatasource) {
       let interfaceData = false
       if (interfaceName) {
@@ -55,12 +55,12 @@ class DataBuilder extends Builder {
             ${interfaceName ? `input.${interfaceData.entity.LCFCCSingular}Type = '${entity.LCFCCSingular}'` : ''}
             input.createdAt = new Date()
             input.updatedAt = new Date()
-            ${entity.UCFCCSingular}.getConnection()
+            ${entity.UCFCCSingular}Model.getConnection()
             .then((db) => {
-              let collection = db.collection(${entity.UCFCCSingular}.collectionName)
+              let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
               collection.insert([input])
               .then((response) => {
-                return ${entity.UCFCCSingular}.one({ _id: response.insertedIds[0] }, ctx)
+                return ${entity.UCFCCSingular}Model.one({ _id: response.insertedIds[0] }, ctx)
               })
               .then((${entity.LCFCCSingular}) => {
                 resolve(${entity.LCFCCSingular})
@@ -88,12 +88,12 @@ class DataBuilder extends Builder {
               throw new Error(JSON.stringify({ message: 'You do not have permission to update ${entity.UCFCCPlural}', code: 401 }))
             }
             input.updatedAt = new Date()
-            ${entity.UCFCCSingular}.getConnection()
+            ${entity.UCFCCSingular}Model.getConnection()
             .then((db) => {
-              let collection = db.collection(${entity.UCFCCSingular}.collectionName)
-              collection.update({ _id: ${entity.UCFCCSingular}.objectId(_id) }, { $set: input })
+              let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
+              collection.update({ _id: ${entity.UCFCCSingular}Model.objectId(_id) }, { $set: input })
               .then((response) => {
-                return ${entity.UCFCCSingular}.one({ _id }, ctx)
+                return ${entity.UCFCCSingular}Model.one({ _id }, ctx)
               })
               .then((${entity.LCFCCSingular}) => {
                 resolve(${entity.LCFCCSingular})
@@ -120,10 +120,10 @@ class DataBuilder extends Builder {
             if (!ctx.user.hasAnyPermission(requiredPermissions)) {
               throw new Error(JSON.stringify({ message: 'You do not have permission to remove ${entity.UCFCCPlural}', code: 401 }))
             }
-            ${entity.UCFCCSingular}.getConnection()
+            ${entity.UCFCCSingular}Model.getConnection()
             .then((db) => {
-              let collection = db.collection(${entity.UCFCCSingular}.collectionName)
-              collection.remove({ _id: ${entity.UCFCCSingular}.objectId(_id) }, ctx)
+              let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
+              collection.remove({ _id: ${entity.UCFCCSingular}Model.objectId(_id) }, ctx)
               .then((response) => {
                 return resolve(_id)
               })
@@ -150,12 +150,12 @@ class DataBuilder extends Builder {
           if (!ctx.user.hasAnyPermission(requiredPermissions)) {
             throw new Error(JSON.stringify({ message: 'You do not have permission to access this ${entity.UCFCCSingular}', code: 401 }))
           }
-          ${entity.UCFCCSingular}.getConnection()
+          ${entity.UCFCCSingular}Model.getConnection()
           .then((db) => {
-            let collection = db.collection(${entity.UCFCCSingular}.collectionName)
-            collection.findOne({ _id: ${entity.UCFCCSingular}.objectId(_id) })
+            let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
+            collection.findOne({ _id: ${entity.UCFCCSingular}Model.objectId(_id) })
             .then((one) => {
-              return resolve(${entity.UCFCCSingular}.create(one))
+              return resolve(${entity.UCFCCSingular}Model.create(one))
             })
             .catch(reject)
             .finally(() => {
@@ -168,8 +168,8 @@ class DataBuilder extends Builder {
       code.closeFunction()
       code.openFunction(`static list`, `{ skip = 0, limit = 1000, filters, order, direction }, ctx`)
       code.addBlock(`
-        let where = ${entity.UCFCCSingular}.getFilters({}, filters)
-        let sort = ${entity.UCFCCSingular}.getOrder({}, order, direction)
+        let where = ${entity.UCFCCSingular}Model.getFilters({}, filters)
+        let sort = ${entity.UCFCCSingular}Model.getOrder({}, order, direction)
         return new Promise((resolve, reject) => {
           let requiredPermissions = [{
             permission: permissions.${entity.UCPlural}_READ,
@@ -181,9 +181,9 @@ class DataBuilder extends Builder {
           if (!ctx.user.hasAnyPermission(requiredPermissions)) {
             throw new Error(JSON.stringify({ message: 'You do not have permission to access ${entity.UCFCCSingular}s', code: 401 }))
           }
-          ${entity.UCFCCSingular}.getConnection()
+          ${entity.UCFCCSingular}Model.getConnection()
           .then((db) => {
-            let collection = db.collection(${entity.UCFCCSingular}.collectionName)
+            let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
             Promise.resolve()
             .then(() => {
               return [
@@ -194,7 +194,7 @@ class DataBuilder extends Builder {
             .spread((list, count) => {
               return resolve({
                 list: _.map(list, (item) => {
-                  return ${entity.UCFCCSingular}.create(item)
+                  return ${entity.UCFCCSingular}Model.create(item)
                 }),
                 total: count,
                 skip: skip,
@@ -223,15 +223,15 @@ class DataBuilder extends Builder {
           if (!ctx.user.hasAnyPermission(requiredPermissions)) {
             throw new Error(JSON.stringify({ message: 'You do not have permission to access ${entity.UCFCCSingular}s', code: 401 }))
           }
-          ${entity.UCFCCSingular}.getConnection()
+          ${entity.UCFCCSingular}Model.getConnection()
           .then((db) => {
-            let collection = db.collection(${entity.UCFCCSingular}.collectionName)
-            let where = ${entity.UCFCCSingular}.getFilters({}, filters)
-            let sort = ${entity.UCFCCSingular}.getOrder({}, order, direction)
+            let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
+            let where = ${entity.UCFCCSingular}Model.getFilters({}, filters)
+            let sort = ${entity.UCFCCSingular}Model.getOrder({}, order, direction)
             collection.find(where).skip(skip).limit(limit).sort(sort).toArray()
             .then((all) => {
               resolve(_.map(all, (item) => {
-                return ${entity.UCFCCSingular}.create(item)
+                return ${entity.UCFCCSingular}Model.create(item)
               }))
             })
             .catch(reject)
@@ -256,10 +256,10 @@ class DataBuilder extends Builder {
           if (!ctx.user.hasAnyPermission(requiredPermissions)) {
             throw new Error(JSON.stringify({ message: 'You do not have permission to count ${entity.UCFCCSingular}s', code: 401 }))
           }
-          ${entity.UCFCCSingular}.getConnection()
+          ${entity.UCFCCSingular}Model.getConnection()
           .then((db) => {
-            let collection = db.collection(${entity.UCFCCSingular}.collectionName)
-            let where = ${entity.UCFCCSingular}.getFilters({}, filters)
+            let collection = db.collection(${entity.UCFCCSingular}Model.collectionName)
+            let where = ${entity.UCFCCSingular}Model.getFilters({}, filters)
             collection.count(where)
             .then((count) => {
               return resolve(count)
@@ -336,7 +336,7 @@ class DataBuilder extends Builder {
                 if (${key}) {
                   where.${key} = {
                     $in: _.map(${key}, (item) => {
-                      return ${entity.UCFCCSingular}.objectId(item)
+                      return ${entity.UCFCCSingular}Model.objectId(item)
                     })
                   }
                 }
@@ -344,7 +344,7 @@ class DataBuilder extends Builder {
             } else if (getNamedType(definition.type) == GraphQLID) {
               code.addBlock(`
                 if (${key}) {
-                  where.${key} = ${entity.UCFCCSingular}.objectId(${key})
+                  where.${key} = ${entity.UCFCCSingular}Model.objectId(${key})
                 }
               `)
             } else {
@@ -380,7 +380,7 @@ class DataBuilder extends Builder {
     }
 
     code.closeClass()
-    code.addExport(entity.UCFCCSingular)
+    code.addExport(`${entity.UCFCCSingular}Model`)
     // console.log(code.toString())
     // process.exit()
     return code.toString()
@@ -388,4 +388,4 @@ class DataBuilder extends Builder {
 
 }
 
-export default DataBuilder
+module.exports = ModelBuilder

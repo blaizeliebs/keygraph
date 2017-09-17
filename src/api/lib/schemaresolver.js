@@ -1,16 +1,18 @@
-import * as _ from 'underscore'
+let _ = require('underscore')
 
 let instance = null
 
 class SchemaResolver {
-
-  schemas = {};
 
   static shared() {
     if (!instance) {
       instance = new SchemaResolver()
     }
     return instance
+  }
+
+  constructor() {
+    this.schemas = {}
   }
 
   register(name, schema) {
@@ -76,4 +78,4 @@ class SchemaResolver {
 
 }
 
-export default SchemaResolver
+module.exports = SchemaResolver

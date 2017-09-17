@@ -1,9 +1,9 @@
-import * as _ from 'underscore'
-import {
+let _ = require('underscore')
+let {
   isAbstractType,
-} from 'graphql'
-import Builder from './builder'
-import CodeGen from './codegen'
+} = require('graphql')
+let Builder = require('./builder')
+let CodeGen = require('./codegen')
 
 class IndexBuilder extends Builder {
 
@@ -15,17 +15,19 @@ class IndexBuilder extends Builder {
     let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.entityData
     let code = new CodeGen()
     code.reset()
-    code.addLine(`import ${entity.UCFCCSingular} from './data'`)
-    code.addLine(`import ${entity.LCFCCSingular}Schema from './schema'`)
+    code.addLine(`let ${entity.UCFCCSingular} = require('./object')`)
+    code.addLine(`let ${entity.UCFCCSingular}Model = require('./model')`)
+    code.addLine(`let ${entity.LCFCCSingular}Schema = require('./schema')`)
     if (false) { // hasList) {
-      code.addLine(`import ${entity.UCFCCSingular}ListMixin from './list'`)
+      code.addLine(`let ${entity.UCFCCSingular}ListMixin = require('./list')`)
     }
     if (hasMutations && !isInterface) {
-      code.addLine(`import ${entity.LCFCCSingular}Mutations from './mutations'`)
+      code.addLine(`let ${entity.LCFCCSingular}Mutations = require('./mutations')`)
     }
     code.addLine(``)
-    code.addLine(`export {`)
-    code.addInsetLine(`${entity.UCFCCSingular} as default,`)
+    code.addLine(`module.exports = {`)
+      code.addInsetLine(`${entity.UCFCCSingular},`)
+    code.addLine(`${entity.UCFCCSingular}Model,`)
     code.addLine(`${entity.LCFCCSingular}Schema,`)
     if (false) { // hasList) {
       code.addLine(`${entity.UCFCCSingular}ListMixin,`)
@@ -40,4 +42,4 @@ class IndexBuilder extends Builder {
 
 }
 
-export default IndexBuilder
+module.exports = IndexBuilder

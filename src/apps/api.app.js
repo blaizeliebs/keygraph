@@ -1,12 +1,12 @@
-import express from 'express'
-import { graphqlExpress } from 'graphql-server-express'
-import { SubscriptionManager } from 'graphql-subscriptions'
-import { createServer } from 'http'
-import { SubscriptionServer } from 'subscriptions-transport-ws'
-import schema from '../api/schema'
-import pubsub from '../api/publisher'
-import APIPublicUser from '../api/lib/apipublicuser'
-import APIRegisteredUser from '../api/lib/apiregistereduser'
+let express = require('express')
+let { graphqlExpress } = require('graphql-server-express')
+let { SubscriptionManager } = require('graphql-subscriptions')
+let { createServer } = require('http')
+let { SubscriptionServer } = require('subscriptions-transport-ws')
+let { schema } = require('../api/schema')
+let pubsub = require('../api/publisher')
+let APIPublicUser = require('../api/lib/apipublicuser')
+let APIRegisteredUser = require('../api/lib/apiregistereduser')
 
 const WS_PORT = 8005
 
@@ -129,4 +129,4 @@ apiApp.use('/', (request, response, next) => {
   })
 })
 
-export default apiApp
+module.exports = apiApp

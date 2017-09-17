@@ -9,4 +9,4 @@ let corsApp = (req, res, next) => {
   }
 }
 
-export default corsApp
+module.exports = corsApp

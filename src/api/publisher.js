@@ -1,5 +1,5 @@
-import { PubSub } from 'graphql-subscriptions'
+let { PubSub } = require('graphql-subscriptions')
 
 const pubsub = new PubSub()
 
-export default pubsub
+module.exports = pubsub

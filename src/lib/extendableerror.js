@@ -14,4 +14,4 @@ class ExtendableError extends Error {
 
 }
 
-export default ExtendableError
+module.exports = ExtendableError

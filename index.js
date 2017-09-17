@@ -1,1 +1,1 @@
-let program = require('./build/index.js');
+let program = require('./src/index.js')

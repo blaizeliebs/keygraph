@@ -1,4 +1,4 @@
-import * as _ from 'underscore'
+let _ = require('underscore')
 
 class CodeGen {
 
@@ -93,7 +93,7 @@ class CodeGen {
     this.appendLine(` from '${from}'`)
   }
   addExport(name) {
-    this.addLine(`export default ${name}`)
+    this.addLine(`module.exports = ${name}`)
   }
   addMultiImport(names, from) {
     this.addLine(`import {`)
@@ -104,7 +104,7 @@ class CodeGen {
     this.addOutsetLine(`} from '${from}'`)
   }
   addMultiExport(names) {
-    this.addLine(`export {`)
+    this.addLine(`module.exports = {`)
     this.inset()
     _.each(names, (name) => {
       this.addLine(`${name},`)
@@ -192,4 +192,4 @@ class CodeGen {
 
 }
 
-export default CodeGen
+module.exports = CodeGen

@@ -2,13 +2,15 @@ let instance = null
 
 class DatasourceResolver {
 
-  datasources = {}
-
   static shared() {
     if (!instance) {
       instance = new DatasourceResolver()
     }
     return instance
+  }
+
+  constructor() {
+    this.datasources = {}
   }
 
   register(name, datasource) {
@@ -21,4 +23,4 @@ class DatasourceResolver {
 
 }
 
-export default DatasourceResolver
+module.exports = DatasourceResolver

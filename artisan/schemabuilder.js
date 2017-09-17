@@ -1,6 +1,6 @@
-import * as _ from 'underscore'
-import CodeGen from './codegen'
-import Builder from './builder'
+let _ = require('underscore')
+let CodeGen = require('./codegen')
+let Builder = require('./builder')
 
 class SchemaBuilder extends Builder {
 
@@ -156,11 +156,11 @@ class SchemaBuilder extends Builder {
       }
     `)
     code.addLine(``)
-    code.addLine(`export default ${entity.LCFCCSingular}Schema`)
+    code.addLine(`module.exports = ${entity.LCFCCSingular}Schema`)
 
     return code.toString()
   }
 
 }
 
-export default SchemaBuilder
+module.exports = SchemaBuilder

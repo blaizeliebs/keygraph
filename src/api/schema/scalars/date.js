@@ -1,6 +1,6 @@
-import { GraphQLScalarType } from 'graphql'
-import { Kind } from 'graphql/language'
-import { GraphQLError } from 'graphql/error'
+let { GraphQLScalarType } = require('graphql')
+let { Kind } = require('graphql/language')
+let { GraphQLError } = require('graphql/error')
 
 function parseDate(value) {
   var result = new Date(value)
@@ -56,4 +56,4 @@ let dateToIsoString = function (date) {
     ':' + pad(tzo % 60)
 }
 
-export default DateQL
+module.exports = DateQL

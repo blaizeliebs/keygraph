@@ -1,16 +1,16 @@
-import { makeExecutableSchema } from 'graphql-tools'
-import DateQL from './scalars/date'
-import TokenQL from './scalars/token'
-import PasswordQL from './scalars/password'
-import {
+let { makeExecutableSchema } = require('graphql-tools')
+let DateQL = require('./scalars/date')
+let TokenQL = require('./scalars/token')
+let PasswordQL = require('./scalars/password')
+let {
   getSchemaDefinitions,
   getSchemaMutations,
   getSchemaSubscriptions,
   getResolverFunctions,
   getMutationFunctions,
-} from './entities/'
+} = require('./entities/')
 
-import Data from './entities/data/'
+let Data = require('./entities/data/object')
 
 const stringSchema = `
   ${getSchemaDefinitions()}
@@ -29,23 +29,20 @@ const stringSchema = `
   }
 `
 
-var resolverMap = {
-  ...getResolverFunctions(),
+var resolverMap = Object.assign({}, getResolverFunctions(), {
   Date: DateQL,
   Token: TokenQL,
   Password: PasswordQL,
   Query: {
-    data: (obj, args, ctx, info) => Data.create({ ...args, name: 'Hello World' }),
+    data: (obj, args, ctx, info) => Data.create(Object.assign({}, args, { name: 'Hello World' })),
   },
-  Mutation: {
-    ...getMutationFunctions(),
-  },
+  Mutation: Object.assign({}, getMutationFunctions()),
   // Subscription: {}
-}
+})
 
 const schema = makeExecutableSchema({
   typeDefs: stringSchema,
   resolvers: resolverMap,
 })
 
-export { schema as default, stringSchema }
+module.exports = { schema, stringSchema }
