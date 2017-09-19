@@ -57,17 +57,7 @@ class ObjectBuilder extends Builder {
       code.addLine(`let ${interfaceData.entity.UCFCCSingular} = require('../${interfaceData.entity.LCSingular}/object')`)
       // process.exit()
     }
-    if (isInterface) {
-      let definedObjects = this.getDefinedSchemaObjects()
-      _.each(definedObjects, (type, key) => {
-        if (!isAbstractType(type)) {
-          if (_.contains(_.map(type.getInterfaces(), 'name'), entity.UCFCCSingular)) {
-            let subType = this.getEntityData(key)
-            code.addLine(`let ${subType.entity.UCFCCSingular} = require('../${subType.entity.LCSingular}/object')`)
-          }
-        }
-      })
-    }
+
     code.addLine(`let APIObject = require('../../../lib/apiobject')`)
 
     let imports = this.getObjectSchemaImports(entity.UCFCCSingular)
@@ -108,8 +98,8 @@ class ObjectBuilder extends Builder {
       })
       for (let s = 0; s < subTypes.length; s++) {
         code.addLine(`if (data.${entity.LCFCCSingular}Type === '${subTypes[s].entity.LCFCCSingular}') {`)
-        // code.addInsetLine(`let ${subTypes[s].entity.UCFCCSingular} = require('../${subTypes[s].entity.LCSingular}/data')`)
-        code.addInsetLine(`return new ${subTypes[s].entity.UCFCCSingular}(data)`)
+        code.addInsetLine(`let ${subTypes[s].entity.UCFCCSingular} = require('../${subTypes[s].entity.LCSingular}/object')`)
+        code.addLine(`return new ${subTypes[s].entity.UCFCCSingular}(data)`)
         code.addOutsetLine(`}`)
       }
       code.addLine(`return null`)

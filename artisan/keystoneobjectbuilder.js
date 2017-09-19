@@ -175,7 +175,7 @@ class KeystoneObjectBuilder extends Builder {
     // console.log(lists)
     code.reset()
     code.addLine(`let keystone = require('keystone')`)
-    code.addLine(`let validate${entity.UCFCCSingular} = require('../../common/validators/${entity.LCSingular}')`)
+    code.addLine(`let { preInsert, preUpdate, preDelete, postInsert, postUpdate, postDelete } = require('../../common/validators/${entity.LCSingular}')`)
     code.addLine(`let Types = keystone.Field.Types`)
     code.addLine(``)
     code.addBlock(`
@@ -237,15 +237,52 @@ class KeystoneObjectBuilder extends Builder {
 
     code.addBlock(`
       ${entity.UCFCCSingular}.schema.pre('save', function(next) {
-        this.updatedAt = new Date()
+        this.wasNew = this.isNew
         let model = this
-        validate${entity.UCFCCSingular}(model, true)
+        if (this.isNew) {
+          this.createdAt = new Date()
+          preInsert(model)
+          .then(() => {
+            next()
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        } else {
+          this.updatedAt = new Date()
+          preUpdate(model)
+          .then(() => {
+            next()
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        }
+      })
+
+      ${entity.UCFCCSingular}.schema.pre('remove', function(next) {
+        let model = this
+        preDelete(model)
         .then(() => {
           next()
         })
         .catch((err) => {
           next(err)
         })
+      })
+
+      ${entity.UCFCCSingular}.schema.post('save', function() {
+        let model = this
+        if (this.wasNew) {
+          postInsert(model)
+        } else {
+          postUpdate(model)
+        }
+      })
+
+      ${entity.UCFCCSingular}.schema.post('remove', function() {
+        let model = this
+        preDelete(model)
       })
     `)
 

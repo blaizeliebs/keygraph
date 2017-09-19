@@ -148,11 +148,25 @@ class SchemaBuilder extends Builder {
       code.addLine(`const mutationDefinitions = \`\``)
     }
     code.addLine(``)
+
+    if (hasSubscription) {
+      code.addBlock(`
+        const subscriptionDefinitions = \`
+          ${entity.LCFCCSingular}Added: Family!
+          ${entity.LCFCCSingular}Updated(_id: ID): Family!
+          ${entity.LCFCCSingular}Removed(_id: ID): ID!
+        \`
+      `)
+    } else {
+      code.addLine(`const subscriptionDefinitions = \`\``)
+    }
+    code.addLine(``)
     code.addBlock(`
       const ${entity.LCFCCSingular}Schema = {
         getSchemaDefinitions: () => schemaDefinitions,
         getListDefinitions: () => listDefinitions,
         getMutationDefinitions: () => mutationDefinitions,
+        getSubscriptionDefinitions: () => subscriptionDefinitions,
       }
     `)
     code.addLine(``)

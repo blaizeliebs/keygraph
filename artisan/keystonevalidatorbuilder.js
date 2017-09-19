@@ -21,13 +21,50 @@ class KeystoneValidatorBuilder extends Builder {
       let keystone = require('keystone')
       let Promise = require('bluebird')
 
-      let validate${entity.UCFCCSingular} = (model, cms = false) => {
+      let preInsert = (model) => {
         return new Promise((resolve, reject) => {
           resolve()
         })
       }
 
-      module.exports = validate${entity.UCFCCSingular}
+      let preUpdate = (model) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }
+
+      let preDelete = (model) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }
+
+      let postInsert = (model) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }
+
+      let postUpdate = (model) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }
+
+      let postDelete = (model) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }
+
+      module.exports = {
+        preInsert,
+        preUpdate,
+        preDelete,
+        postInsert,
+        postUpdate,
+        postDelete,
+      }
 
     `)
     return code.toString()

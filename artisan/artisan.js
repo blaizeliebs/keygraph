@@ -314,7 +314,12 @@ class Artisan {
     code.addOutsetLine(`}`)
     code.addLine(``)
     code.addLine(`function getSchemaSubscriptions() {`)
-    code.addInsetLine(`return \`\``)
+    code.addInsetLine(`return \``)
+    code.inset()
+    _.each(exportItems, (exportItem) => {
+      code.addLine(`\${${exportItem.name}.getSubscriptionDefinitions()}`)
+    })
+    code.addOutsetLine(`\``)
     code.addOutsetLine(`}`)
     code.addLine(``)
     code.addLine(`function getResolverFunctions() {`)
@@ -446,20 +451,24 @@ class Artisan {
   buildAll() {
     let schemaObjects = this.getDefinedSchemaObjects()
     _.each(schemaObjects, (type, key) => {
-      let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.getEntityData(key)
-      this.buildObjectFile(entity.UCFCCSingular)
-      this.buildModelFile(entity.UCFCCSingular)
-      if (hasMutations && !isInterface) {
-        this.buildMutationFile(entity.UCFCCSingular)
-      } else {
-        this.removeMutationFile(entity.UCFCCSingular)
+      try {
+        let { entity, interfaceName, hasList, hasMutations, hasSubscription, hasDatasource, isInterface } = this.getEntityData(key)
+        this.buildObjectFile(entity.UCFCCSingular)
+        this.buildModelFile(entity.UCFCCSingular)
+        if (hasMutations && !isInterface) {
+          this.buildMutationFile(entity.UCFCCSingular)
+        } else {
+          this.removeMutationFile(entity.UCFCCSingular)
+        }
+        if (false) { // hasList) {
+          this.buildListFile(entity.UCFCCSingular)
+        } else {
+          this.removeListFile(entity.UCFCCSingular)
+        }
+        this.buildIndexFile(entity.UCFCCSingular)
+      } catch (e) {
+        console.log(`SKIPPING: ${type}`)
       }
-      if (false) { // hasList) {
-        this.buildListFile(entity.UCFCCSingular)
-      } else {
-        this.removeListFile(entity.UCFCCSingular)
-      }
-      this.buildIndexFile(entity.UCFCCSingular)
     })
     let directory = sh.pwd().toString()
     let entitiesDir = path.join(directory, `./src/api/schema/entities/`)
@@ -497,22 +506,25 @@ class Artisan {
       fs.mkdirSync(validatorDirectory)
     }
     _.each(schemaObjects, (type, key) => {
-      let entityData = this.getEntityData(key)
-      let modelBuilder = new KeystoneObjectBuilder(schema, entityData)
-      let modelCode = modelBuilder.build()
-      if (modelCode) {
-        fs.writeFileSync(`${modelDirectory}/${key}.js`, modelCode)
-      }
       try {
-        var stats = fs.statSync(`${validatorDirectory}/${entityData.entity.LCSingular}.js`)
-      } catch (e) {
-        let validatorBuilder = new KeystoneValidatorBuilder(schema, entityData)
-        let validaorCode = validatorBuilder.build()
-        if (validaorCode) {
-          fs.writeFileSync(`${validatorDirectory}/${entityData.entity.LCSingular}.js`, validaorCode)
+        let entityData = this.getEntityData(key)
+        let modelBuilder = new KeystoneObjectBuilder(schema, entityData)
+        let modelCode = modelBuilder.build()
+        if (modelCode) {
+          fs.writeFileSync(`${modelDirectory}/${key}.js`, modelCode)
         }
+        try {
+          var stats = fs.statSync(`${validatorDirectory}/${entityData.entity.LCSingular}.js`)
+        } catch (e) {
+          let validatorBuilder = new KeystoneValidatorBuilder(schema, entityData)
+          let validaorCode = validatorBuilder.build()
+          if (validaorCode) {
+            fs.writeFileSync(`${validatorDirectory}/${entityData.entity.LCSingular}.js`, validaorCode)
+          }
+        }
+      } catch (e) {
+        console.log(`SKIPPING: ${key}`)
       }
-
     })
   }
 
