@@ -246,7 +246,7 @@ class KeystoneObjectBuilder extends Builder {
             next()
           })
           .catch((err) => {
-            reject(err)
+            next(err)
           })
         } else {
           this.updatedAt = new Date()
@@ -255,7 +255,7 @@ class KeystoneObjectBuilder extends Builder {
             next()
           })
           .catch((err) => {
-            reject(err)
+            next(err)
           })
         }
       })
